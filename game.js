@@ -1,11 +1,17 @@
 var Game = function() {
   // Set the width and height of the scene.
-  this._width = 1920;
-  this._height = 1080;
+  this._width = document.body.clientWidth;
+  this._height = document.body.clientHeight;
   this._center = {
     x: Math.round(this._width / 2),
     y: Math.round(this._height / 2)
   };
+  
+  // Determine the scale to use for all elements.
+  this._scale = this._width / 1920;
+  if(this._scale * 1080 < this._height){
+    this._scale = this._height / 1080;
+  }
 
   // Setup the rendering surface.
   this.renderer = new PIXI.autoDetectRenderer(this._width, this._height);
@@ -49,6 +55,8 @@ Game.prototype = {
     bg.anchor.y = 0.5;
     bg.position.x = this._center.x;
     bg.position.y = this._center.y;
+    bg.width = Math.round(this._scale * 1920);
+    bg.height = Math.round(this._scale * 1080);
 
     // Mount onto the stage.
     this.stage.addChild(bg);
@@ -94,7 +102,7 @@ Game.prototype = {
     // Turn this into a button.
     button.interactive = true;
     button.buttonMode = true;
-    button.click = function() {
+    button.click = button.tap =  function() {
       document.body.style.cursor = 'default';
       this.stage.removeChild(button);
       this.stage.removeChild(name);
@@ -179,7 +187,7 @@ Game.prototype = {
         // Make the rock clickable.
         rock.interactive = true;
         rock.buttonMode = true;
-        rock.click = this.explodeRock.bind(this, rock);
+        rock.click = rock.tap = this.explodeRock.bind(this, rock);
 
         // Tween the rock with an easing function to simulate physics.
         var y1 = Math.round(50 + Math.random() * 500);
